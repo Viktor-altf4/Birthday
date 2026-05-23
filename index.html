@@ -319,79 +319,6 @@
   }
   #pwd-btn:hover { opacity: 0.85; transform: scale(1.03); }
 
-  /* ========== MUSIC CONTROL ========== */
-  #music-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 100;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(16px);
-    color: var(--gold);
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s, background 0.3s;
-    animation: fadeUp 1s 1s ease both;
-  }
-  #music-btn:hover { transform: scale(1.1); background: rgba(245,200,66,0.15); }
-  #music-btn.muted { color: rgba(255,255,255,0.35); }
-
-  /* ========== MUSIC UPLOAD PANEL ========== */
-  #music-panel {
-    position: fixed;
-    bottom: 84px;
-    right: 24px;
-    z-index: 100;
-    background: rgba(13,0,21,0.92);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 18px 20px;
-    width: 240px;
-    display: none;
-    flex-direction: column;
-    gap: 12px;
-    animation: fadeUp 0.3s ease;
-  }
-  #music-panel.open { display: flex; }
-  #music-panel p { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; text-align: center; }
-  #music-panel label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(135deg, var(--purple-mid), var(--neon-purple));
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: opacity 0.3s, transform 0.2s;
-    color: var(--white);
-  }
-  #music-panel label:hover { opacity: 0.85; transform: scale(1.02); }
-  #music-panel input[type="file"] { display: none; }
-  #music-track-name {
-    font-size: 11px;
-    color: var(--gold-light);
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  #music-track-name.show { opacity: 1; }
-  #music-vol-row { display: flex; align-items: center; gap: 10px; }
-  #music-vol-row span { font-size: 14px; }
-  #music-vol { flex: 1; accent-color: var(--gold); cursor: pointer; }
-
   /* ========== UNLOCKED SECTION ========== */
   #unlocked-section {
     display: none;
@@ -635,24 +562,6 @@
 
 <div id="easter-egg">✨ You found the secret! Konami code unlocked!</div>
 
-<audio id="bg-music" loop></audio>
-
-<div id="music-panel">
-  <p>Upload a song to play as background music 🎵</p>
-  <label for="music-upload">
-    🎶 Choose a song
-    <input type="file" id="music-upload" accept="audio/*" onchange="loadSong(this)">
-  </label>
-  <div id="music-track-name">No track loaded</div>
-  <div id="music-vol-row">
-    <span>🔈</span>
-    <input type="range" id="music-vol" min="0" max="1" step="0.05" value="0.7" oninput="setVolume(this.value)">
-    <span>🔊</span>
-  </div>
-</div>
-
-<button id="music-btn" onclick="toggleMusicPanel()" title="Music">🎵</button>
-
 <div id="main">
   <div class="top-badge">A Special Surprise Awaits You ✦</div>
 
@@ -755,12 +664,9 @@
 // =====================================================
 const BIRTHDAY_DATE = new Date('2025-12-25T00:00:00'); // 🎂 SET BIRTHDAY DATE HERE
 const PASSWORD = 'iloveyou';  // 🔑 SET EARLY ACCESS PASSWORD HERE
-const PERSON_NAME = 'My Love'; // 💛 SET NAME HERE
 
-const BIRTHDAY_MESSAGE = `Today is your day — and every single thing about it is meant to celebrate you. 
-The way you laugh, the way you care, the way you light up every room you walk into... 
-You deserve every beautiful thing this world has to offer.
-Happy Birthday, ${PERSON_NAME}. This day and every day, you are so deeply loved. 🌹`;
+// 💌 WRITE YOUR BIRTHDAY MESSAGE HERE — use \n for line breaks
+const BIRTHDAY_MESSAGE = `Today is your day, and every single thing about it is meant to celebrate you.\n\nYou deserve every beautiful thing this world has to offer.\n\nHappy Birthday — you are so deeply loved. 🌹`;
 
 // =====================================================
 // PARTICLE BACKGROUND
@@ -914,7 +820,7 @@ function startTypewriter() {
   const el = document.getElementById('typewriter-text');
   el.textContent = '';
   let i = 0;
-  const speed = 40;
+  const speed = 35;
   function type() {
     if (i < BIRTHDAY_MESSAGE.length) {
       el.textContent += BIRTHDAY_MESSAGE[i];
@@ -1096,58 +1002,8 @@ function triggerSuperCelebration() {
 }
 
 // =====================================================
-// MUSIC — UPLOAD YOUR OWN SONG
+// PASSWORD EARLY ACCESS
 // =====================================================
-let musicPlaying = false;
-
-function toggleMusicPanel() {
-  document.getElementById('music-panel').classList.toggle('open');
-}
-
-function loadSong(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const audio = document.getElementById('bg-music');
-  const url = URL.createObjectURL(file);
-  audio.src = url;
-  audio.volume = parseFloat(document.getElementById('music-vol').value);
-  audio.play();
-  musicPlaying = true;
-  document.getElementById('music-btn').textContent = '🔊';
-  document.getElementById('music-btn').classList.remove('muted');
-  const nameEl = document.getElementById('music-track-name');
-  nameEl.textContent = file.name.replace(/\.[^/.]+$/, '');
-  nameEl.classList.add('show');
-}
-
-function setVolume(val) {
-  const audio = document.getElementById('bg-music');
-  audio.volume = parseFloat(val);
-  if (parseFloat(val) === 0) {
-    musicPlaying = false;
-    document.getElementById('music-btn').textContent = '🔇';
-    document.getElementById('music-btn').classList.add('muted');
-  } else if (!musicPlaying && audio.src) {
-    audio.play();
-    musicPlaying = true;
-    document.getElementById('music-btn').textContent = '🔊';
-    document.getElementById('music-btn').classList.remove('muted');
-  }
-}
-
-document.getElementById('music-btn').addEventListener('click', function(e) {
-  const audio = document.getElementById('bg-music');
-  if (!audio.src) { toggleMusicPanel(); return; }
-  toggleMusicPanel();
-});
-
-document.addEventListener('click', function(e) {
-  const panel = document.getElementById('music-panel');
-  const btn = document.getElementById('music-btn');
-  if (!panel.contains(e.target) && e.target !== btn) panel.classList.remove('open');
-});
-
-
 function togglePasswordInput() {
   document.getElementById('password-input-wrapper').classList.toggle('show');
 }
